@@ -11,15 +11,13 @@
   <form method="post" action="" class="formArea js-formArea">
     <div id="ajaxArea" class="js-set-html">
       <p>ここだけ入れ替わります</p>
-      <h1>名前は<span class="js-set-name"></span>です。
-    年齢は<span class="js-set-age"></span>です。</h1>
     </div>
-      <p><?php echo date('Y/M/d H:i:s') ?></p>
-      名前
-      <input type="text" name="name" class="inputText js-get-val-name" autocomplete="off">
-      年齢
-      <input type="number" name="age" class="inputText inputText--s js-get-val-age" autocomplete="off">
-      <input type="submit" value="送信" class="btn">
+    <p><?php echo date('Y/m/d H:i:s') ?></p>
+    名前
+    <input type="text" name="name" class="inputText js-get-val-name" autocomplete="off">
+    年齢
+    <input type="number" name="age" class="inputText inputText--s js-get-val-age" autocomplete="off">
+    <input type="submit" value="送信" class="btn">
   </form>
 
 <!-- jQuery -->
