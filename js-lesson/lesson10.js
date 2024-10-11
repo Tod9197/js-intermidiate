@@ -218,6 +218,15 @@ for (var i = 1; i < 10; i++) {
 }
 
 //*************************************************************
+// オブジェクトについて
+//*************************************************************
+
+// JSで扱うものは全てオブジェクトかオブジェクトのように使える
+// オブジェクトはプロパティとメソッドがある
+// プロパティは値を保存しておく変数と同じで、オブジェクトの状態や特性を表すために使われる
+// メソッドは関数と同じで、オブジェクトの振る舞い(動き)を表すために使われる
+
+//*************************************************************
 // オブジェクトの作り方
 // オブジェクト→プロパティとメソッドを持っている
 //*************************************************************
@@ -238,3 +247,154 @@ human.sayinfo = function () {
 };
 
 console.log(human.sayinfo());
+
+//こうやっても同じ
+var human = {
+  name: "yamaguchi",
+  age: 40,
+  sex: "男",
+  sayInfo: function () {
+    return (
+      "私は" +
+      human.name +
+      "で年齢は" +
+      human.age +
+      "で性別は" +
+      human.sex +
+      "です。"
+    );
+  },
+};
+
+console.log(human.sayInfo());
+
+//*************************************************************
+// new演算子とは？
+//*************************************************************
+
+//new演算子
+var obj1 = new Object();
+var obj2 = {}; //上記のobj1とやっていることは同じ
+console.log(obj1);
+console.log(obj2);
+
+//newをつかなかった場合
+//クラス(設計図)を作る
+var human = function () {
+  this.name = "Akira";
+  this.say = function () {
+    return this.name;
+  };
+};
+var obj1 = new human();
+var obj2 = human();
+console.log(obj1.say());
+// console.log(obj2.say()); //undefined
+
+// インスタンスはクラス(設計図)をコピーして実際の物を作るようなもの
+// newは勝手にインスタンスを返却してくれる
+// newをつけなければただ関数を実行しただけ
+
+console.log(obj1);
+console.log(obj2);
+
+var human = function () {
+  this.name = "yamaguchi";
+  this.say = function () {
+    return this.name;
+  };
+  return "ただ実行しただけ";
+};
+var obj3 = human();
+
+console.log(obj3);
+
+//*************************************************************
+// 独自コンストラクタの作り方
+//*************************************************************
+
+// JSではコンストラクタはただの「関数」
+// 関数内で呼び出すthisは呼び出し元のオブジェクトを参照する
+var Monster = function (name, hp, attack) {
+  this.name = name;
+  this.hp = hp;
+  this.attack = attack;
+  this.doAttack = function () {
+    console.log(this.name + "は" + this.attack + "のダメージを与えた");
+  };
+};
+
+// なので、newすればインスタンスがthisの参照先になる
+var slime = new Monster("スライム", 10, 10);
+var demon = new Monster("デーモン", 30, 40);
+console.log(slime.doAttack());
+console.log(demon.doAttack());
+
+// こう作っているのと動きは同じになる(prototypeの中身が違ったりinstanceofの判定が違ったりと実際の中身は違う)
+var slime = {
+  name: "スライム",
+  hp: 10,
+  attack: 10,
+  doAttack: function () {
+    console.log(slime.name + "は" + slime.attack + "のダメージを与えた");
+  },
+};
+
+var demon = {
+  name: "デーモン",
+  hp: 30,
+  attack: 40,
+  doAttack: function () {
+    console.log(demon.name + "は" + demon.attack + "のダメージを与えた");
+  },
+};
+console.log(slime.doAttack());
+console.log(demon.doAttack());
+
+//*************************************************************
+// オブジェクトとプリミティブ型
+//*************************************************************
+
+// プリミティブ型はboolean,number,string,undefinedのこと
+// プリミティブ型は基本は値そのもの
+// でもたまに一時的にオブジェクトになっている
+
+var num = 51;
+num2 = new Number(73);
+console.log(typeof num); //number型
+console.log(typeof num2); //object(Numberオブジェクトのインスタンス)
+console.log(num.toString); //オブジェクトじゃないからこんなメソッドないはずがなぜか使える
+console.log(num2.toString());
+
+//jsのプリミティブ型はオブジェクトのように使おうとすると勝手にそれぞれの型に応じた「ラッパーオブジェクト」を裏で作ってくれる
+var num = 55;
+//こうした瞬間
+console.log(num.toString());
+//裏ではこんなコードが自動で走っている
+//
+var num_tmp = num; //一旦プリミティブ値を退避する
+num.toString = function () {
+  //文字列に変換するメソッド
+};
+//処理が完了するとラッパーオブジェクトは破壊され、普通のプリミティブ型に戻る
+num = num_tmp; //num変数に退避させたプリミティブ値を入れ戻す
+delete num_tmp; //作ったラッパーオブジェクトは捨てる
+
+//*************************************************************
+// オブジェクトは後から変更可能
+//*************************************************************
+
+//JSでは作ったオブジェクトやすでに用意されたネイティブなオブジェクトも変更できてしまう
+//JSという言語自体をぶっ壊せるということでもある
+//JAVAやPHPなど他の言語ではあり得ないことがJSではできる(一般的な言語は後から変更しようとするとエラーになる)
+//後から変更できるのは自由度が高い反面、いつの間にか変更されていて苦づかず処理が進んでしまうバグの温床にもなる
+
+var str = new String();
+str.myFunc = function () {
+  return "インスタンスに追加してしまった";
+};
+console.log(str.myFunc());
+String.myFunc = function () {
+  return "ネイティブオブジェクトにも追加してしまった";
+};
+console.log(String.myFunc());
