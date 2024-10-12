@@ -398,3 +398,357 @@ String.myFunc = function () {
   return "ネイティブオブジェクトにも追加してしまった";
 };
 console.log(String.myFunc());
+
+//*************************************************************
+// Objectオブジェクト
+//*************************************************************
+
+//全てのベースとなっているオブジェクト
+//配列オブジェクトなども全てこのObjectがベースでできている
+
+var arr = new Array("HTML", "CSS", "JS");
+var arr = ["HTML", "CSS", "JS"];
+console.log(arr);
+arr.str = "追加してしまった";
+console.log(arr);
+
+//*************************************************************
+// Globalオブジェクト
+//*************************************************************
+
+//ネイティブオブジェクトと違って、インスタンス化したり、メソッド呼び出ししたりできない
+// var global = new Global(); //NG
+// global.myFunc(); //NG
+
+// GlobalオブジェクトはGlobal変数やGlobal関数を格納しておくためのオブジェクト(一番の親玉みたいなもの)
+//GlobalオブジェクトはJSエンジンが初期化されたタイミングで自動で作られる
+var str = "yamaguchi";
+console.log(str);
+console.log(window.str); //windowはGlobalオブジェクト。Globalオブジェクトは省略できる
+
+//*************************************************************
+// 関数
+//*************************************************************
+
+// JSの関数はややこしい。他の言語を習得している人が理解しづらい部分
+
+//*************************************************************
+// 関数の定義方法
+//*************************************************************
+
+// 関数の定義方法は3種類
+// 1.function命令
+// 2.Functionコンスストラクた
+// 3.関数リテラル
+
+// 1.function命令
+function muFunc() {}
+
+// 3.関数リテラル
+// var myFunc = myFunc(){
+
+// };
+// myFunc = 72;
+
+//*************************************************************
+// 変数のスコープ→変数が使える範囲
+//*************************************************************
+
+//関数の外で定義するとグローバル変数
+var globalVal = 75;
+console.log(globalVal); //75
+//関数の中で定義するとローカル変数
+function myFunc() {
+  var localVal = 81;
+}
+// console.log(localVal); //undefined
+
+var val = 91;
+function myFunc() {
+  console.log(val); //undefined
+  var val = 120;
+}
+
+//myFuncの中で読んだvalはローカル変数のvalを読んだことになる。ローカル変数はまだ未定義なのでundefinedになる。
+
+//*************************************************************
+// 関数の引数
+//*************************************************************
+
+//関数では、引数のチェックは行われない
+
+function myFunc(num) {
+  console.log(num);
+}
+myFunc(101);
+myFunc(101, "第2引数を入れた"); //他のプログラミング言語ではエラーが出るがJSでは普通に処理される
+
+//2つ関数を作ったらどっちで処理される？
+function myFunc(num) {
+  console.log("第1引数のみの関数");
+}
+function myFunc(num, str) {
+  console.log("第2引数まである関数");
+}
+myFunc(110);
+myFunc(120, "第2引数を入れた");
+
+//同じ関数を上書きしただけ。PHPであれば別の関数として扱われる
+
+//引数をチェック
+
+//argumentsオブジェクトは関数内だけで使えるオブジェクトで、関数を作ると自動で作成される。
+//関数で使う引数は全てargumentsオブジェクトで管理されている
+function myFunc(num) {
+  console.log(arguments[0]);
+  console.log(arguments[1]);
+}
+myFunc(315, "第2引数を挿入");
+//lengthでチェックする
+
+// function myFunc(val1, val2) {
+//   if (arguments.length !== 2) {
+//     throw new Error("引数が不正です");
+//   }
+//   console.log(val1 + val2);
+// }
+
+// myFunc(330);
+
+//*************************************************************
+// this
+//*************************************************************
+
+//1.メソッド呼び出しパターン
+//2 関数呼び出しパターン
+//3 コンストラクタ呼び出しパターン
+//4 apply,call呼び出しパターン
+
+//メソッド呼び出しパターン
+var myObject = {
+  value: 10,
+  show: function () {
+    console.log(this.value);
+    console.log(this);
+  },
+};
+myObject.show();
+
+//関数呼び出しパターン
+myObject.show(); //メソッド呼び出し
+show(); //関数呼び出し
+
+function show() {
+  console.log(this);
+  this.value = 1;
+}
+show(); //関数呼び出しの場合のthisはグローバルオブジェクトを指す
+
+//ちょっとややこしい例
+var myObject = {
+  show: function () {
+    console.log(this.value); //1
+    console.log(this); //myObject
+
+    function myFunc() {
+      console.log(this.value);
+      console.log(this); //window メソッド呼び出しの中で「関数呼び出し」されているので
+    }
+  },
+};
+myObject.show();
+
+//コンストラクタ呼び出しパターン
+function MyObject(value) {
+  this.myValue = value;
+  this.myFunc = function () {
+    this.myValue++;
+  };
+}
+var myObject = new MyObject(0);
+console.log(myObject.myValue); //0
+myObject.myFunc();
+console.log(myObject.myValue);
+
+var myObject2 = new MyObject(3);
+console.log(myObject.myValue); //3
+myObject.myFunc();
+console.log(myObject.myValue); //4
+
+//thisはインスタンスを指す
+
+//newをつけないと
+var myObject = MyObject(0);
+console.log(window);
+console.log(window.myValue);
+console.log(window.myFunc);
+//ただの関数呼び出しになるのでthisはwondowを指すため、windowに入る
+
+//4. apply,call呼び出しパターン
+var myObject = {
+  value: 1,
+  show: function () {
+    console.log(this.value);
+  },
+};
+var yourObject = {
+  value: 3,
+};
+myObject.show(); //1
+myObject.show.apply(yourObject); //3
+myObject.show.call(yourObject); //3
+
+//*************************************************************
+// プロトタイプ
+//*************************************************************
+
+//JSにはクラスという概念がない(ESから導入)
+//クラスの代わりがプロトタイプ
+//プロトタイプとはprototypeプロパティのこと
+//prototypeに何か入れておけば、インスタンス化した時に引き継げる(オブジェクト指向でいうstaticプロパティやstaticメソッドが作れる)
+
+//*************************************************************
+// staticなメンバ
+//*************************************************************
+
+var Monster = function (name, hp, attack) {
+  this.name = name;
+  this.hp = hp;
+  this.attack = attack;
+  this.doAttack = function () {
+    console.log(this.name + "は" + this.attack + "のダメージを与えた");
+  };
+};
+var zombie = new Monster("ゾンビ", 100, 80);
+var kimela = new Monster("キメラ", 150, 120);
+console.log(zombie.doAttack());
+console.log(kimela.doAttack());
+
+//これではメソッドもコピーされて別々になる
+//後からメソッドの中身を変更しようとするとそれぞれのインスタンスのメソッドを修正する必要がある
+
+//prototypeを使った場合
+var Monster = function (name, hp, attack) {
+  this.name = name;
+  this.hp = hp;
+  this.attack = attack;
+};
+Monster.prototype.doAttack = function () {
+  console.log(this.name + "は" + this.attack + "のダメージを与えた");
+};
+var knight = new Monster("ナイト", 250, 150);
+var madohand = new Monster("マドハンド", 140, 70);
+knight.doAttack();
+madohand.doAttack();
+
+//インスタンス毎にメソッドを増やさないので、メモリの節約になる
+
+//*************************************************************
+// 後から追加できる
+//*************************************************************
+//インスタンス化した後にprototypeを追加しても全部のインスタンスが反映される
+
+//*************************************************************
+// プロトタイプチェーン
+//*************************************************************
+
+//prototypeを使ってオブジェクト指向でいう「継承」ができる仕組みのこと
+//prototypeの中に別のインスタンスを入れておけば、そのインスタンスのプロパティやメソッドが利用できる。
+//継承元のインスタンスが変われば、継承先にも反映される
+var Creature = function () {};
+Creature.prototype = {
+  doAttack: function () {
+    console.log(this.name + "は" + this.attack + "のダメージを与えた");
+  },
+};
+var Monster = function (name, hp, attack, cry) {
+  this.name = name;
+  this.hp = hp;
+  this.attack = attack;
+  this.doCry = function () {
+    console.log(cry);
+  };
+};
+var Human = function (name, hp, attack) {
+  this.name = name;
+  this.hp = hp;
+  this.attack = attack;
+  this.doRun = function () {
+    console.log(this.name + "は全力で逃げた");
+  };
+};
+Monster.prototype = new Creature();
+Human.prototype = new Creature();
+
+var gargoil = new Monster("ガーゴイル", 300, 200, "キエエエエエ");
+var human = new Human("男", 300, 250);
+
+gargoil.doCry();
+gargoil.doAttack();
+human.doAttack();
+human.doRun();
+
+//*************************************************************
+// 高階関数
+//*************************************************************
+
+//関数自身を引数や戻り値として扱う関数のこと
+function myFunc(arr, func) {
+  for (var key in arr) {
+    func(arr[key]);
+  }
+}
+myFunc(["HTML", "CSS", "JS"], function (val) {
+  console.log(val);
+});
+
+//*************************************************************
+// アクティベーションオブジェクト
+//*************************************************************
+//関数呼び出し時に作成される目に見えない変数オブジェクトというものがあり、その目に見えない変数オブジェクトのことをアクティベーションオブジェクト(もしくはCallオブジェクト)という。
+//アクティベーションオブジェクトには引数、ローカル変数だけでなく、argumenntsオブジェクト、thisが格納される。
+//変数オブジェクトは関数の実行時に生成され、関数宣言しただけではアクセスすることができない
+//myFunc()実行時に生成されるアクティベーションオブジェクト
+// {
+//   arguments:,
+//   this:,
+//   foo:,
+//   bar:,
+//   var1:,
+//   var2:,
+// }
+function myFunc(foo, bar) {
+  var var1, var2;
+}
+
+//*************************************************************
+// スコープチェーン
+//*************************************************************
+//スコープチェーンとはJSがどんな順序でプロパティを参照するかを決めたルールのようなもの
+//Callオブジェクト(アクティベーションオブジェクトともいう)は関数を呼び出す度に内部で自動生成されるオブジェクトで、関数内で関数内のローカル変数を管理している
+
+//Globalオブジェクトのスコープ
+var x = "Global";
+var y = "Global";
+//outerFuncのCallオブジェクトのスコープ
+function outerFunc() {
+  var x = "Local Outer";
+  //innerFuncのCallオブジェクトのスコープ
+  function innerFunc() {
+    var x = "Local Inner";
+    console.log(x); //Local Inner
+    console.log(y); //Global
+    // console.log(z); //undefined
+  }
+  console.log(x); //Local Outer
+  innerFunc();
+}
+console.log(x); //Global
+outerFunc();
+
+//*************************************************************
+// クロージャ
+//*************************************************************
+//普通の言語を習っていると頭がこんがらがる部分
+//「自分を囲むスコープにある変数を参照できる関数」がクロージャ
+//関数の中のローカル変数はずっと保持される
