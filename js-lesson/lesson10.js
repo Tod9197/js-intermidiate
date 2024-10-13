@@ -752,3 +752,56 @@ outerFunc();
 //普通の言語を習っていると頭がこんがらがる部分
 //「自分を囲むスコープにある変数を参照できる関数」がクロージャ
 //関数の中のローカル変数はずっと保持される
+function outerFunc() {
+  var value = 1;
+
+  function innerFunc() {
+    console.log(++value);
+  }
+  return innerFunc;
+}
+var fn1 = outerFunc(); //innerFuncという関数オブジェクトが変数に格納される
+fn1(); //2
+fn1(); //3
+fn1(); //4
+//innerFuncのCallオブジェクトはouterFuncのCallオブジェクトのローカル変数を参照しているので破棄されずに残ったまま
+
+//プライベート変数を持ったクラスが作れる
+var Module = function () {
+  var count = 0; //プロパティ(プライベート)
+
+  return {
+    //メソッド
+    increment: function () {
+      console.log(count++);
+    },
+  };
+};
+var md1 = new Module();
+var md2 = new Module();
+md1.count; //undefined
+md1.increment(); //0
+md1.increment(); //1
+md2.count; //undefined
+md2.increment(); //0
+md2.increment(); //2
+
+//こうやっても同じように見えるが、外からプロパティにアクセスできてしまう
+var Module = function () {
+  this.count = 0;
+  this.increment = function () {
+    console.log(this.count++);
+  };
+};
+
+var md1 = new Module();
+var md2 = new Module();
+md1.increment(); //0
+md1.increment(); //1
+md2.increment(); //0
+md2.increment(); //1
+md2.increment(); //2
+md1.count; //2
+md2.count; //3
+
+//おさらい：関数はnewして使える。newした場合はインスタンスを返す。その場合は関数のことを「コンストラクタ」と呼ぶ。
