@@ -805,3 +805,57 @@ md1.count; //2
 md2.count; //3
 
 //おさらい：関数はnewして使える。newした場合はインスタンスを返す。その場合は関数のことを「コンストラクタ」と呼ぶ。
+
+function Module2() {
+  this.count = 0;
+  this.increment = function () {
+    console.log(this.conut++);
+  };
+}
+var md3 = new Module2();
+md1.increment(); //0
+md1.increment(); //1
+
+//ホイスティング(巻き上げ)とは、通常コードは上から下に実行されるため、関数宣言してから出ないと関数は使えないが、JS独特の「ホイスティング」という機能によって、まずコード全体の中から関数だけを巻き上げて(抜き出して)、先に関数を登録しておいた上でコードが実行されるもの。なので下記のような関数宣言前にも使える
+
+var md4 = new Module3();
+md4.increment();
+
+function Module3() {
+  this.count = 0;
+  this.increment = function () {
+    console.log(this.conut++);
+  };
+}
+
+//ただし、無名関数を変数に格納する方法の場合、変数の宣言に対してホスティングは起こらないので、宣言後でないと使えない。
+
+// var md5 = new Module4(); // Uncaught TypeError: Module4 is not a constructor
+
+var Module4 = function () {
+  this.count = 0;
+  this.increment = function () {
+    console.log(this.count++);
+  };
+};
+
+//これもプロパティは保持されているが、この場合はインスタンスは作れず、別変数に格納してもオブジェクトを見ている
+var module = {
+  count: 0,
+  increment: function () {
+    console.log(this.count++);
+  },
+};
+
+var md1 = module;
+var md2 = module;
+md1.increment(); //0
+md1.increment(); //1
+md1.increment(); //2
+md1.increment(); //3
+md1 === md2;
+
+//クロージャは下記の時に使える
+//1.グローバル変数の宣言をなるべく減らしたい時
+//2. ユーザーが引数を与えてカスタマイズ可能な自由度の高い「関数」を生成したい場合
+//3. 前回、呼び出されて実行された時の演算結果(値)を内部で保存して、次に呼び出された時、前回の結果(値)に対して、さらに同じ処理(演算)を行う関数を生成したい時
